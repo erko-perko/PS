@@ -1,7 +1,7 @@
 /*
 Primer proizvajalec porabnik
 Ustvarimo proizvajalce in porabnike, na koncu preverimo, kaj se je zgodilo z zahtevami.
-Težava, ne počakamo, da proizvajalci in porabniki zaključijo
+Glavna nit pošlje signal za zaustavitev. Težava, ne vemo kdaj se gorutine zares ustavijo.
 */
 package main
 
@@ -20,20 +20,29 @@ type consumer struct {
 	counter int
 }
 
-func (p *producer) start(id int, interval time.Duration, data chan<- int) {
+func (p *producer) start(id int, interval time.Duration, data chan<- int, quit <-chan struct{}) {
 	p.id = id
 	for {
-		p.counter++
-		data <- p.counter
+		select {
+		case <-quit:
+			return
+		default:
+			p.counter++
+			data <- p.counter
+		}
 		time.Sleep(interval)
 	}
 }
 
-func (c *consumer) start(id int, interval time.Duration, data <-chan int) {
+func (c *consumer) start(id int, interval time.Duration, data <-chan int, quit <-chan struct{}) {
 	c.id = id
 	for {
-		<-data
-		c.counter++
+		select {
+		case <-data:
+			c.counter++
+		case <-quit:
+			return
+		}
 		time.Sleep(interval)
 	}
 }
@@ -53,24 +62,26 @@ func checkWork(ps []producer, cs []consumer) {
 }
 
 func main() {
-	data := make(chan int)
+	data := make(chan int, 100)
+	quit := make(chan struct{})
 	nProducers := 10
 	nConsumers := 10
 
 	producers := make([]producer, nProducers)
 	consumers := make([]consumer, nConsumers)
-	intervalProducers := 10 * time.Millisecond
-	intervalConsumers := 10 * time.Millisecond
+	intervalProducers := 0 * time.Millisecond
+	intervalConsumers := 0 * time.Millisecond
 
 	for i := range producers {
-		go producers[i].start(i, intervalProducers, data)
+		go producers[i].start(i, intervalProducers, data, quit)
 	}
 
 	for i := range consumers {
-		go consumers[i].start(i, intervalConsumers, data)
+		go consumers[i].start(i, intervalConsumers, data, quit)
 	}
 
 	time.Sleep(2 * time.Second)
+	close(quit)
 	checkWork(producers, consumers)
 
 }
