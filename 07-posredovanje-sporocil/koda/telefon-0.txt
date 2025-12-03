@@ -1,0 +1,8 @@
+Telefon 0 prejel utrip: [1] 0
+Telefon 0 prejel utrip: [4] 1
+Telefon 0 prejel utrip: [2] 2
+Telefon 0 prejel utrip: [3] 3
+Telefon 0 poslal sporočilo 0- telefonu na naslovu 127.0.0.1:9002
+Telefon 0 posluša na 127.0.0.1:9001
+Telefon 0 prejel sporočilo: 0-1-2-3-4-
+0-1-2-3-4-0

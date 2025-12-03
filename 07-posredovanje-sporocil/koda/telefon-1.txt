@@ -1,0 +1,3 @@
+Telefon 1 posluša na 127.0.0.1:9002
+Telefon 1 prejel sporočilo: 0-
+Telefon 1 poslal sporočilo 0-1- telefonu na naslovu 127.0.0.1:9003
