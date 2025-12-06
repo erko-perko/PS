@@ -1,0 +1,3 @@
+Process 1 waiting for message.
+[Process 1 ] Received message: 'Root message' from 127.0.0.1:9000
+[Process 1 ] Timeout waiting for message.
